@@ -44,7 +44,8 @@ export class MajorVersionUpdate implements VersionUpdater {
       0,
       0,
       version.preRelease,
-      version.build
+      version.build,
+      version.preReleaseSeparator
     );
   }
 }
@@ -65,7 +66,8 @@ export class MinorVersionUpdate implements VersionUpdater {
       version.minor + 1,
       0,
       version.preRelease,
-      version.build
+      version.build,
+      version.preReleaseSeparator
     );
   }
 }
@@ -86,7 +88,8 @@ export class PatchVersionUpdate implements VersionUpdater {
       version.minor,
       version.patch + 1,
       version.preRelease,
-      version.build
+      version.build,
+      version.preReleaseSeparator
     );
   }
 }

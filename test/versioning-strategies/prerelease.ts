@@ -128,6 +128,14 @@ describe('PrereleaseVersioningStrategy', () => {
         const newVersion = await strategy.bump(oldVersion, commits);
         expect(newVersion.toString()).to.equal('0.2.0-beta');
       });
+      it('can bump a PEP 440 alpha version for a breaking change', async () => {
+        const strategy = new PrereleaseVersioningStrategy({
+          prerelease: true,
+        });
+        const oldVersion = Version.parse('2.0.0a2');
+        const newVersion = await strategy.bump(oldVersion, commits);
+        expect(newVersion.toString()).to.equal('2.0.0a3');
+      });
     });
     describe('without prerelease property', () => {
       const expectedBumps: Record<string, string> = {

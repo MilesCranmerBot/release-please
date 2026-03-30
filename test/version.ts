@@ -128,6 +128,26 @@ describe('Version', () => {
       expect(version.build).to.equal('678');
       expect(version.toString()).to.equal(input);
     });
+    it('can read a PEP 440 alpha version', async () => {
+      const input = '2.0.0a2';
+      const version = Version.parse(input);
+      expect(version.major).to.equal(2);
+      expect(version.minor).to.equal(0);
+      expect(version.patch).to.equal(0);
+      expect(version.preRelease).to.equal('a2');
+      expect(version.build).is.undefined;
+      expect(version.toString()).to.equal(input);
+    });
+    it('can read a PEP 440 release candidate version', async () => {
+      const input = '2.0.0rc3';
+      const version = Version.parse(input);
+      expect(version.major).to.equal(2);
+      expect(version.minor).to.equal(0);
+      expect(version.patch).to.equal(0);
+      expect(version.preRelease).to.equal('rc3');
+      expect(version.build).is.undefined;
+      expect(version.toString()).to.equal(input);
+    });
   });
   describe('compare', () => {
     it('should handle pre-release versions', () => {
@@ -148,6 +168,10 @@ describe('Version', () => {
         '1.2.3',
         '2.2.0',
       ]);
+    });
+    it('should compare PEP 440 alpha versions correctly', () => {
+      const comparison = Version.parse('2.0.0a2').compare(Version.parse('2.0.0a1'));
+      expect(comparison).to.eql(1);
     });
   });
   describe('isPreMajor', () => {

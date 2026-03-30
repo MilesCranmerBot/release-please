@@ -93,7 +93,8 @@ class PrereleasePatchVersionUpdate extends AbstractPrereleaseVersionUpdate {
         version.minor,
         version.patch,
         nextPrerelease,
-        version.build
+        version.build,
+        version.preReleaseSeparator
       );
     }
     return new Version(
@@ -101,7 +102,8 @@ class PrereleasePatchVersionUpdate extends AbstractPrereleaseVersionUpdate {
       version.minor,
       version.patch + 1,
       this.prereleaseType,
-      version.build
+      version.build,
+      version.preReleaseSeparator
     );
   }
 }
@@ -123,7 +125,8 @@ class PrereleaseMinorVersionUpdate extends AbstractPrereleaseVersionUpdate {
           version.minor,
           version.patch,
           nextPrerelease,
-          version.build
+          version.build,
+          version.preReleaseSeparator
         );
       }
 
@@ -134,7 +137,8 @@ class PrereleaseMinorVersionUpdate extends AbstractPrereleaseVersionUpdate {
       version.minor + 1,
       0,
       this.prereleaseType,
-      version.build
+      version.build,
+      version.preReleaseSeparator
     );
   }
 }
@@ -155,7 +159,8 @@ class PrereleaseMajorVersionUpdate extends AbstractPrereleaseVersionUpdate {
           version.minor,
           version.patch,
           nextPrerelease,
-          version.build
+          version.build,
+          version.preReleaseSeparator
         );
       }
       return new MajorVersionUpdate().bump(version);
@@ -165,7 +170,8 @@ class PrereleaseMajorVersionUpdate extends AbstractPrereleaseVersionUpdate {
       0,
       0,
       this.prereleaseType,
-      version.build
+      version.build,
+      version.preReleaseSeparator
     );
   }
 }

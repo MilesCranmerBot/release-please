@@ -15,7 +15,15 @@
 import * as semver from 'semver';
 
 const VERSION_REGEX =
-  /(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(-(?<preRelease>[^+]+))?(\+(?<build>.*))?/;
+  /^(?<major>\d+)\.(?<minor>\d+)\.(?<patch>\d+)(?:(?<preReleaseSeparator>-)(?<preRelease>[^+]+)|(?<pep440PreRelease>(?:a|b|rc)\d+))?(\+(?<build>.*))?$/;
+const PEP440_PRERELEASE_REGEX = /^(?<label>a|b|rc)(?<number>\d+)$/;
+
+function normalizedPrerelease(preRelease?: string): string | undefined {
+  if (!preRelease) return preRelease;
+  const match = preRelease.match(PEP440_PRERELEASE_REGEX);
+  if (!match?.groups) return preRelease;
+  return `${match.groups.label}.${match.groups.number}`;
+}
 
 /**
  * This data class is used to represent a SemVer version.
@@ -26,19 +34,24 @@ export class Version {
   readonly patch: number;
   readonly preRelease?: string;
   readonly build?: string;
+  readonly preReleaseSeparator?: '-' | '';
 
   constructor(
     major: number,
     minor: number,
     patch: number,
     preRelease?: string,
-    build?: string
+    build?: string,
+    preReleaseSeparator?: '-' | ''
   ) {
     this.major = major;
     this.minor = minor;
     this.patch = patch;
     this.preRelease = preRelease;
     this.build = build;
+    this.preReleaseSeparator = preRelease
+      ? preReleaseSeparator ?? '-'
+      : undefined;
   }
 
   /**
@@ -56,9 +69,22 @@ export class Version {
     const major = Number(match.groups.major);
     const minor = Number(match.groups.minor);
     const patch = Number(match.groups.patch);
-    const preRelease = match.groups.preRelease;
+    const preRelease =
+      match.groups.preRelease || match.groups.pep440PreRelease || undefined;
     const build = match.groups.build;
-    return new Version(major, minor, patch, preRelease, build);
+    const preReleaseSeparator = preRelease
+      ? match.groups.preReleaseSeparator
+        ? '-'
+        : ''
+      : undefined;
+    return new Version(
+      major,
+      minor,
+      patch,
+      preRelease,
+      build,
+      preReleaseSeparator
+    );
   }
 
   /**
@@ -69,7 +95,14 @@ export class Version {
    *   are the same, or 1 otherwise.
    */
   compare(other: Version): -1 | 0 | 1 {
-    return semver.compare(this.toString(), other.toString());
+    return semver.compare(this.toSemverString(), other.toSemverString());
+  }
+
+  private toSemverString(): string {
+    const preRelease = normalizedPrerelease(this.preRelease);
+    const preReleasePart = preRelease ? `-${preRelease}` : '';
+    const buildPart = this.build ? `+${this.build}` : '';
+    return `${this.major}.${this.minor}.${this.patch}${preReleasePart}${buildPart}`;
   }
 
   /**
@@ -78,7 +111,9 @@ export class Version {
    * @returns {string}
    */
   toString(): string {
-    const preReleasePart = this.preRelease ? `-${this.preRelease}` : '';
+    const preReleasePart = this.preRelease
+      ? `${this.preReleaseSeparator ?? '-'}${this.preRelease}`
+      : '';
     const buildPart = this.build ? `+${this.build}` : '';
     return `${this.major}.${this.minor}.${this.patch}${preReleasePart}${buildPart}`;
   }
